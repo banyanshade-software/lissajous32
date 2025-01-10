@@ -224,6 +224,7 @@ static void MX_TIM1_Init(void)
   TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig = {0};
 
   /* USER CODE BEGIN TIM1_Init 1 */
+	HAL_TIM_Base_Start(&htim1);
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;

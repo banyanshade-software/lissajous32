@@ -78,6 +78,20 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN Private defines */
 
+extern TIM_HandleTypeDef htim1;
+extern DMA_HandleTypeDef hdma_tim1_ch1;
+extern DMA_HandleTypeDef hdma_tim1_ch2;
+extern DMA_HandleTypeDef hdma_tim1_ch3;
+extern DMA_HandleTypeDef hdma_tim1_ch4;
+
+//extern osThreadId defaultTaskHandle;
+
+extern DMA_HandleTypeDef hdma_tim1_ch1;
+extern DMA_HandleTypeDef hdma_tim1_ch2;
+extern DMA_HandleTypeDef hdma_tim1_ch3;
+extern DMA_HandleTypeDef hdma_tim1_ch4;
+
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
