@@ -11,6 +11,6 @@
 
 
 void pwm_tim_it(void);
-void pwm_task(void);
+void sigGenTask(void const * argument);
 
 #endif /* PWMDMA_H_ */

@@ -10,6 +10,8 @@
 #include "cmsis_os.h"
 #include "main.h"
 #include "pwmdma.h"
+#include "itm_debug.h"
+
 
 #define USE_DMA 0
 #define MAXBUF 1024
@@ -30,15 +32,21 @@ static uint16_t fillsine(uint16_t *buf, uint16_t freq)
 	// f=25000 -> 2 samples at 50kHz sampling
 	buflen = 50000/freq;
 	if (buflen>=MAXBUF) buflen=MAXBUF;
+	int li = 0;
 	for (int i=0; i<MAXBUF; i++) {
-
+		uint16_t k = i%(VALUEONE+1);
+		//...
+		buf1[i]=k;
+		if (k==VALUEONE) li = i;
 	}
-	return buflen;
+	if (!li) return buflen;
+	return li;
 }
+
 static void fillbuf(void)
 {
-	buflen1 = fillsine(buf1, 5*3000);
-	buflen2 = fillsine(buf2, 7*3000);
+	buflen1 = fillsine(buf1, 5*100);
+	buflen2 = fillsine(buf2, 7*100);
 }
 
 static void pwmdma_start(void)
@@ -57,10 +65,28 @@ static void pwmdma_start(void)
 
 void pwm_tim_it(void)
 {
-
+	static int cnt = 0;
+	cnt++;
+	if (0==(cnt%50000)) {
+		itm_debug1(DBG_TIM, "hop", cnt);
+	}
 }
 
-void pwm_task(void)
+void sigGenTask(void const * argument)
 {
-
+	itm_debug1(DBG_ERR, "gogogogogogogogogo", 0);
+	itm_debug1(DBG_ERR, "1234567890", 0);
+	itm_debug1(DBG_ERR, "go", 0);
+	itm_debug1(DBG_ERR, "go", 0);
+	itm_debug1(DBG_ERR, "go", 0);
+	itm_debug1(DBG_ERR, "go", 0);
+	itm_debug1(DBG_ERR, "go", 0);
+	itm_debug1(DBG_ERR, "go", 0);
+	itm_debug1(DBG_ERR, "go", 0);
+	fillbuf();
+	pwmdma_start();
+	itm_debug1(DBG_ERR, "go1", 0);
+	for (;;) {
+		osDelay(3000);
+	}
 }
