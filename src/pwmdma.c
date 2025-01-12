@@ -5,7 +5,14 @@
  *      Author: danielbraun
  */
 
-
+//! Although this file is called pwmdma.c we don't do
+//! yet DMA, but only IT based timer update.
+//!
+//! for each channel, we fill up sigbuf at startup
+//! the signal is then sent to PWM timer through interrupt
+//! handler
+//!
+//! future version will use DMA for zero cpu generation
 
 #include "cmsis_os.h"
 #include "main.h"
@@ -16,6 +23,7 @@
 #include <math.h>
 
 #define USE_DMA 0
+
 #define MAXBUF 1024
 #define BASEFREQ  50000
 #define BASEFREQF (1.0*BASEFREQ)
@@ -29,13 +37,15 @@ typedef struct sigbuf {
 	volatile uint16_t ridx;
 } sigbuf_t;
 
-#define NCHAN 2
+#define NCHAN 4
 static sigbuf_t gen[NCHAN];
 
 
 
+/// curently unused
+/// create a simple ramp
 ///
-///
+/// @param buf buffer to fill
 _UNUSED_ static void  fillramp(sigbuf_t *buf)
 {
 	int li = 0;
@@ -91,7 +101,12 @@ static int adjust_freq(float fs, float f, float *fa)
     return npa;
 }
 
-
+/// fill buffer with a sinewave
+/// fillsine() may slightly adjust the frequency so
+/// that a full period can be generated and loop
+///
+/// @param buf	buffer to fill
+/// @param freq frequency in Hz
 static void fillsine(sigbuf_t *buf, float freq)
 {
 	float freqa;
@@ -112,8 +127,7 @@ static void fillsine(sigbuf_t *buf, float freq)
 
 static void fillbuf(void)
 {
-	fillsine(&gen[0], 3000.);
-	fillsine(&gen[1], 2500.);
+
 	//fillramp(&gen[1]);
 }
 
@@ -123,10 +137,14 @@ static void pwmdma_start(void)
 	HAL_TIM_Base_Start(&htim1);
 	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, buf1, buflen1);
 	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_2, buf2, buflen2);
+	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_2, buf3, buflen2);
+	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_2, buf4, buflen2);
 #else
 	HAL_TIM_Base_Start_IT(&htim1);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
+	HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_4);
 #endif
 
 }
@@ -136,7 +154,7 @@ void pwm_tim_it(void)
 	static int cnt = 0;
 	cnt++;
 	if (0==(cnt%50000)) {
-		itm_debug1(DBG_TIM, "hop", cnt);
+		//itm_debug1(DBG_TIM, "hop", cnt);
 	}
 	for (int i=0; i<NCHAN; i++) {
 		uint16_t v = gen[i].buf[gen[i].ridx];
@@ -165,7 +183,12 @@ void pwm_tim_it(void)
 void sigGenTask(void const * argument)
 {
 	itm_debug1(DBG_ERR, "go", 0);
-	fillbuf();
+
+	fillsine(&gen[0], 3000.);
+	fillsine(&gen[1], 2700.);
+	fillsine(&gen[2], 2300.);
+	fillsine(&gen[3], 1200.);
+
 	pwmdma_start();
 	itm_debug1(DBG_ERR, "go1", 0);
 	for (;;) {
