@@ -90,7 +90,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-  ITM_SendChar(0x42);
+  //ITM_SendChar(0x42);
 
 
   /* USER CODE END SysInit */
@@ -125,14 +125,7 @@ int main(void)
 
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
-  ITM_SendChar(0x42);
-  ITM_SendChar(0x42);
-  ITM_SendChar(0x42);
-  ITM_SendChar(0x42);
-  ITM_SendChar(0x42);
-  ITM_SendChar(0x42);
-  ITM_SendChar(0x42);
-  ITM_SendChar(0x42);
+
 
   /* USER CODE END RTOS_THREADS */
 

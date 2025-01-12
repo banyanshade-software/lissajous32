@@ -125,11 +125,6 @@ static void fillsine(sigbuf_t *buf, float freq)
 }
 
 
-static void fillbuf(void)
-{
-
-	//fillramp(&gen[1]);
-}
 
 static void pwmdma_start(void)
 {
@@ -154,8 +149,9 @@ void pwm_tim_it(void)
 	static int cnt = 0;
 	cnt++;
 	if (0==(cnt%50000)) {
-		//itm_debug1(DBG_TIM, "hop", cnt);
+		itm_debug1(DBG_TIM, "hop", cnt);
 	}
+	return;
 	for (int i=0; i<NCHAN; i++) {
 		uint16_t v = gen[i].buf[gen[i].ridx];
 		gen[i].ridx++;
@@ -182,15 +178,16 @@ void pwm_tim_it(void)
 
 void sigGenTask(void const * argument)
 {
-	itm_debug1(DBG_ERR, "go", 0);
+	itm_debug1(DBG_ERR, "go1", 1);
 
 	fillsine(&gen[0], 3000.);
 	fillsine(&gen[1], 2700.);
 	fillsine(&gen[2], 2300.);
 	fillsine(&gen[3], 1200.);
 
+	itm_debug1(DBG_ERR, "go2", 2);
 	pwmdma_start();
-	itm_debug1(DBG_ERR, "go1", 0);
+	itm_debug1(DBG_ERR, "go3", 3);
 	for (;;) {
 		osDelay(3000);
 	}
